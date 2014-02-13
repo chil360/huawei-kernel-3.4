@@ -570,6 +570,7 @@ KBUILD_CFLAGS	+= -O2
 endif
 ifdef CONFIG_CC_OPTIMIZE_ALOT
 KBUILD_CFLAGS	+= -O3
+KBUILD_CFLAGS   += -Os $(call cc-disable-warning,maybe-uninitialized,)
 endif
 
 KBUILD_CFLAGS	+= -DHUAWEI_KERNEL_VERSION=\"${HUAWEI_KERNEL_VERSION}\"
