@@ -89,7 +89,7 @@ typedef struct{
 	unsigned int freq_idx;
 	unsigned int freq_value;
 } freq_table_idx;
-freq_table_idx pre_freq_idx[SUP_CORE_NUM] = {};
+static freq_table_idx pre_freq_idx[SUP_CORE_NUM] = {};
 
 #endif
 
@@ -105,14 +105,14 @@ typedef struct {
 	unsigned int hist_load_cnt;
 } history_load;
 static void reset_hist(history_load *hist_load);
-history_load hist_load[SUP_CORE_NUM] = {};
+static history_load hist_load[SUP_CORE_NUM] = {};
 
 typedef struct {
 	unsigned int hist_max_load[SUP_HIGH_SLOW_UP_DUR];
 	unsigned int hist_load_cnt;
 } history_load_high;
 static void reset_hist_high(history_load_high *hist_load);
-history_load_high hist_load_high[SUP_CORE_NUM] = {};
+static history_load_high hist_load_high[SUP_CORE_NUM] = {};
 
 #endif
 
@@ -883,10 +883,13 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 
 				cpumask_set_cpu(cpu, &cpus_timer_done);
 				if (dbs_info->cur_policy) {
+					dbs_timer_exit(dbs_info);
 					/* restart dbs timer */
+					mutex_lock(&dbs_info->timer_mutex);
 					dbs_timer_init(dbs_info);
 					/* Enable frequency synchronization
 					 * of CPUs */
+					mutex_unlock(&dbs_info->timer_mutex);
 					atomic_set(&dbs_info->sync_enabled, 1);
 				}
 skip_this_cpu:
